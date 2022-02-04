@@ -18,13 +18,15 @@ export default function BlogForm(props) {
       };
       if (props.blog) {
         const [index, res] = await axiosRequests("put", `blog/${props.blog._id}`, payload);
-        if (index) navigate("/");
+        index ? navigate("/") : alert(res.message);
       } else {
         const [index, res] = await axiosRequests("post", "blog", payload);
         if (index) {
           setBlogs((prevState) => [...prevState, res.data]);
           setTitle("");
           setBody("");
+        } else {
+          alert(res.message);
         }
       }
     }
@@ -41,9 +43,16 @@ export default function BlogForm(props) {
         <label className="form-label">Body</label>
         <textarea row="6" className="form-control" onChange={(e) => setBody(e.target.value)} value={body} />
         {body.length == 0 && <span className="text-danger position-absolute">Body is required</span>}
+        {body.length > 1000 && (
+          <span className="text-danger position-absolute">Body should not exceed 1000 characters</span>
+        )}
       </div>
       <div className="d-grid gap-2 col-6 mx-auto mt-5">
-        <button type="submit" className="btn btn-primary btn-block" disabled={title.length == 0 || body.length == 0}>
+        <button
+          type="submit"
+          className="btn btn-primary btn-block"
+          disabled={title.length == 0 || body.length == 0 || body.length > 1000}
+        >
           {props.blog ? "Save changes" : "Submit"}
         </button>
       </div>
